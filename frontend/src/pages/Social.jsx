@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import "./Social.css";
 
@@ -9,11 +9,12 @@ export default function Social() {
   const [theme, setTheme] = useState("light"); // light or dark
   const username = localStorage.getItem("username");
   const token = localStorage.getItem("token");
+  const API_URL = process.env.REACT_APP_API_URL;
 
-  // Fetch posts
-  const fetchPosts = async () => {
+  // Fetch posts (useCallback to avoid useEffect warning)
+  const fetchPosts = useCallback(async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/posts", {
+      const res = await axios.get(`${API_URL}/api/posts`, {
         headers: { "x-auth-token": token },
       });
 
@@ -27,11 +28,11 @@ export default function Social() {
     } catch (err) {
       console.error(err);
     }
-  };
+  }, [API_URL, token]);
 
   useEffect(() => {
     fetchPosts();
-  }, []);
+  }, [fetchPosts]);
 
   // Create post
   const submitPost = async () => {
@@ -42,11 +43,9 @@ export default function Social() {
     if (image) formData.append("image", image);
 
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/posts",
-        formData,
-        { headers: { "x-auth-token": token } }
-      );
+      const res = await axios.post(`${API_URL}/api/posts`, formData, {
+        headers: { "x-auth-token": token },
+      });
 
       setPosts([{ ...res.data, likes: [], comments: [], showCommentInput: false }, ...posts]);
       setText("");
@@ -198,7 +197,7 @@ export default function Social() {
                 <p>{p.text}</p>
                 {p.image && (
                   <div className="post-image-container">
-                    <img src={`http://localhost:5000/${p.image}`} className="post-media" alt="post" />
+                    <img src={`${API_URL}/${p.image}`} className="post-media" alt="post" />
                   </div>
                 )}
               </div>

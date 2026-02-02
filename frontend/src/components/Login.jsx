@@ -7,10 +7,11 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
+  const API_URL = process.env.REACT_APP_API_URL; // Use environment variable
 
   const login = async () => {
     try {
-      const res = await axios.post('http://localhost:5000/api/auth/login', {
+      const res = await axios.post(`${API_URL}/api/auth/login`, {
         email: email.trim(),
         password: password.trim()
       });
@@ -45,7 +46,9 @@ export default function Login() {
         onChange={e => setPassword(e.target.value)}
         value={password}
       />
-      <Button variant="contained" sx={{ mb: 2 }} onClick={login}>Login & Go Social</Button>
+      <Button variant="contained" sx={{ mb: 2 }} onClick={login}>
+        Login & Go Social
+      </Button>
 
       <p>
         Don't have an account? <a href="/signup">Signup here</a>
